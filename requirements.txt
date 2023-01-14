@@ -1,1 +1,6 @@
 pandas
+arrow
+requests
+json
+tableauscraper
+bs4
