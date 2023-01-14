@@ -134,41 +134,44 @@ show_condition(
 	get_curtailment_status()
 )
 
+try:
 
-percent_flow = get_90th_percentile_flow(
-	start_date="1912-05-01",
-	end_date="2022-06-05",
-	percentile=90
+	percent_flow = get_90th_percentile_flow(
+		start_date="1912-05-01",
+		end_date="2022-06-05",
+		percentile=90
+		)
+
+	date = end_date
+	newman_90 = percent_flow.pipe(lambda df:df.loc[
+		(df['month_nu'] == date.format('M'))
+		& (df['day_nu'] == date.format('D'))
+		])['p90_va'].astype(float).iloc[0]
+
+
+	newman = get_USGS_flow(
+		"11274000",
+		start_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
+		end_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
 	)
-
-date = end_date
-newman_90 = percent_flow.pipe(lambda df:df.loc[
-	(df['month_nu'] == date.format('M'))
-	& (df['day_nu'] == date.format('D'))
-	])['p90_va'].astype(float).iloc[0]
-
-
-newman = get_USGS_flow(
-	"11274000",
-	start_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
-	end_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
-)
-newman_average = newman['15012_00060'].astype(float).mean()
-show_condition(
-	"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
-	newman_average > newman_90,	
-	)
+	newman_average = newman['15012_00060'].astype(float).mean()
+	show_condition(
+		"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
+		newman_average > newman_90,	
+		)
+	with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
+		st.markdown(newman_90)
+	with st.expander("c. Hourly and 24 hour rolling mean flow of SJR at Newman (Gage 11274000)"):
+		st.dataframe(newman)
+		st.markdown(f"**Rolling Average = {newman['15012_00060'].mean():.2f}**")
+except Exception as e:
+	st.write(e)
 
 # st.markdown("## Delta Outflow (DTO)")
 flow = display_cdec("DTO","23","D")
 show_condition("a. delta outflow is above 44,500 cfs",flow['value'].iloc[0] > 44500)
 
 
-with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
-	st.markdown(newman_90)
-with st.expander("c. Hourly and 24 hour rolling mean flow of SJR at Newman (Gage 11274000)"):
-	st.dataframe(newman)
-	st.markdown(f"**Rolling Average = {newman['15012_00060'].mean():.2f}**")
 
 
 
