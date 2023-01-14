@@ -3,4 +3,5 @@ arrow
 requests
 json
 tableauscraper
-bs4
+beautifulsoup4
+lxml
