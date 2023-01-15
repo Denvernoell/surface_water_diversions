@@ -13,7 +13,7 @@ start_date = arrow.now().shift(days=-2)
 end_date = start_date.shift(days=1)
 
 # st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
-st.markdown(f"**{end_date.format('YYYY-MM-DD')}**")
+st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
 
 def show_condition(condition, passes):
 	c1,c2 = st.columns(2)
@@ -80,6 +80,7 @@ def display_cdec(station,sensors,dur_code):
 def get_USGS_flow(site,start_time, end_time):
 	# Newman station
 	url = f"https://waterservices.usgs.gov/nwis/iv/?sites={site}&parameterCd=00060&startDT={start_time}&endDT={end_time}&siteStatus=all&format=rdb"
+	st.markdown(url)
 	df = pd.read_csv(url, skiprows=26, sep="\t")
 	df = df.drop(index = [0])
 	return df
@@ -144,7 +145,6 @@ show_condition(
 )
 
 try:
-
 	percent_flow = get_90th_percentile_flow(
 		start_date="1912-05-01",
 		end_date="2022-06-05",
