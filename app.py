@@ -9,9 +9,11 @@ from bs4 import BeautifulSoup
 st.title("Surface Water Diversion Check")
 # date = st.date_input("Date")
 # start_date = arrow.get(date)
-start_date = arrow.now().shift(days=-1)
+start_date = arrow.now().shift(days=-2)
 end_date = start_date.shift(days=1)
-st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
+
+# st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
+st.markdown(f"**{end_date.format('YYYY-MM-DD')}**")
 
 def show_condition(condition, passes):
 	c1,c2 = st.columns(2)
