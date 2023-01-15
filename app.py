@@ -74,13 +74,23 @@ def display_cdec(station,sensors,dur_code):
 
 
 
+def get_USGS_flow(site,start_date, end_date):
+	"""
+	takes start and end date as arrow
+	local:    https://waterservices.usgs.gov/nwis/iv/?sites=11274000&parameterCd=00060&startDT=2023-01-13T10:51:58.023-08:00&endDT=2023-01-14T10:51:58.023-08:00&siteStatus=all&format=rdb
+	st cloud: https://waterservices.usgs.gov/nwis/iv/?sites=11274000&parameterCd=00060&startDT=2023-01-13T18:51:31.183+00:00&endDT=2023-01-14T18:51:31.183+00:00&siteStatus=all&format=rdb
+	"""
+	
+	# top fails on streamlit cloud because of time zone
+	# time_format = "YYYY-MM-DDTHH:mm:ss.SSSZZ"
+	time_format = "YYYY-MM-DDTHH:mm:ss.SSS-08:00"
 
+	start_time = start_date.floor('day').format(time_format)
+	end_time = end_date.floor('day').format(time_format)
 
-
-def get_USGS_flow(site,start_time, end_time):
 	# Newman station
 	url = f"https://waterservices.usgs.gov/nwis/iv/?sites={site}&parameterCd=00060&startDT={start_time}&endDT={end_time}&siteStatus=all&format=rdb"
-	st.markdown(url)
+	# st.markdown(url)
 	df = pd.read_csv(url, skiprows=26, sep="\t")
 	df = df.drop(index = [0])
 	return df
@@ -144,41 +154,37 @@ show_condition(
 	get_curtailment_status()
 )
 
-try:
-	percent_flow = get_90th_percentile_flow(
-		start_date="1912-05-01",
-		end_date="2022-06-05",
-		percentile=90
-		)
 
-	date = end_date
-	newman_90 = percent_flow.pipe(lambda df:df.loc[
-		(df['month_nu'] == date.format('M'))
-		& (df['day_nu'] == date.format('D'))
-		])['p90_va'].astype(float).iloc[0]
-	with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
-		st.markdown(newman_90)
-
-except Exception as e:
-	st.write(e)
-
-try:
-	newman = get_USGS_flow(
-		"11274000",
-		start_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
-		end_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
+newman_percent_flow = get_90th_percentile_flow(
+	start_date="1912-05-01",
+	end_date="2022-06-05",
+	percentile=90
 	)
-	newman_average = newman['15012_00060'].astype(float).mean()
-	with st.expander("c. Hourly and 24 hour rolling mean flow of SJR at Newman (Gage 11274000)"):
-		st.dataframe(newman)
-		st.markdown(f"**Rolling Average = {newman['15012_00060'].mean():.2f}**")
-except Exception as e:
-	st.write(e)
 
-	# show_condition(
-	# 	"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
-	# 	newman_average > newman_90,	
-	# 	)
+
+newman_90 = newman_percent_flow.pipe(lambda df:df.loc[
+	(df['month_nu'] == end_date.format('M'))
+	& (df['day_nu'] == end_date.format('D'))
+	])['p90_va'].astype(float).iloc[0]
+
+with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
+	st.markdown(newman_90)
+
+newman = get_USGS_flow(
+	"11274000",
+	start_date,
+	end_date,
+)
+newman_average = newman['15012_00060'].astype(float).mean()
+with st.expander("c. Hourly and 24 hour rolling mean flow of SJR at Newman (Gage 11274000)"):
+	st.dataframe(newman)
+	st.markdown(f"**Rolling Average = {newman['15012_00060'].mean():.2f}**")
+
+
+show_condition(
+	"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
+	newman_average > newman_90,	
+	)
 
 
 # st.markdown("## Delta Outflow (DTO)")
