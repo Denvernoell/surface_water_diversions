@@ -68,6 +68,13 @@ def display_cdec(station,sensors,dur_code):
 		st.markdown(f"**Rolling Average = {flow['value'].mean():.2f}**")
 	return flow
 
+
+
+
+
+
+
+
 def get_USGS_flow(site,start_time, end_time):
 	# Newman station
 	url = f"https://waterservices.usgs.gov/nwis/iv/?sites={site}&parameterCd=00060&startDT={start_time}&endDT={end_time}&siteStatus=all&format=rdb"
@@ -147,33 +154,34 @@ try:
 		(df['month_nu'] == date.format('M'))
 		& (df['day_nu'] == date.format('D'))
 		])['p90_va'].astype(float).iloc[0]
+	with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
+		st.markdown(newman_90)
 
+except Exception as e:
+	st.write(e)
 
+try:
 	newman = get_USGS_flow(
 		"11274000",
 		start_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
 		end_date.format("YYYY-MM-DDTHH:mm:ss.SSSZZ"),
 	)
 	newman_average = newman['15012_00060'].astype(float).mean()
-	show_condition(
-		"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
-		newman_average > newman_90,	
-		)
-	with st.expander("g. daily 90th percentile flow values published by USGS at Newman Gage (Jan1 -Mar 31)"):
-		st.markdown(newman_90)
 	with st.expander("c. Hourly and 24 hour rolling mean flow of SJR at Newman (Gage 11274000)"):
 		st.dataframe(newman)
 		st.markdown(f"**Rolling Average = {newman['15012_00060'].mean():.2f}**")
 except Exception as e:
 	st.write(e)
 
+	# show_condition(
+	# 	"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
+	# 	newman_average > newman_90,	
+	# 	)
+
+
 # st.markdown("## Delta Outflow (DTO)")
 flow = display_cdec("DTO","23","D")
 show_condition("a. delta outflow is above 44,500 cfs",flow['value'].iloc[0] > 44500)
-
-
-
-
 
 
 with st.expander("e. Hourly and 24 hour rolling mean flow of Eastside Bypass at El Nido (Gage ELN)"):
