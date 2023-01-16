@@ -136,7 +136,7 @@ def get_curtailment_status():
 	return manual_c == automatic_c == ['Not Curtailed']
 
 
-Checks, Operations, Conditions = st.tabs(["Checks", "Operations", "Conditions"])
+Checks, Operations, Conditions, Diagram = st.tabs(["Checks", "Operations", "Conditions","Diagram"])
 
 with Checks:
 	newman_percent_flow = get_90th_percentile_flow(
@@ -264,3 +264,32 @@ with Conditions:
 	with st.expander("f. Daily record of spillway discharge and control regulating discharge from Friant (Gage MIL)"):
 		MIL_spill.display()
 		MIL_regulated.display()
+
+with Diagram:
+	# """
+	# use graphviz to draw a diagram starting with flow at MIL going to GFR then SJB  then ELN then newman
+	# """
+	st.graphviz_chart(f"""
+	digraph G {{
+		rankdir=TB;
+		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}"]
+		GRF [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS"]
+		SJB [label = "SJB = {SJB.flow['value'].mean():,.0f} CFS"]
+		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS"]
+		newman [label = "newman = {newman_average:,.0f} CFS"]
+		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS"]
+
+		node [shape=box];
+
+		MIL ->
+		GRF ->
+		SJB ->
+		ELN ->
+		newman ->
+		DTO
+		;
+	}}
+	""")
+
+		# GRF [label = {}] ->
+		# SJB [label = {SJB.flow['value'].mean()}] ->
