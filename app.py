@@ -54,7 +54,8 @@ class CDEC_flow:
 			# ! excel export and json export are shifted by 1
 			# df = df.shift(1, freq='H')
 		elif dur_code == "D":
-			df = pd.DataFrame(J)[1:]
+			# df = pd.DataFrame(J)[1:]
+			df = pd.DataFrame(J)[:-1]
 
 		df.index = pd.to_datetime(df['date'])
 		df['value'] = df['value'].where(df['value']>-9990,np.nan)
@@ -269,21 +270,21 @@ with Diagram:
 	# """
 	# use graphviz to draw a diagram starting with flow at MIL going to GFR then SJB  then ELN then newman
 	# """
+	# https://graphviz.org/doc/info/shapes.html
+	shape = "box"
 	st.graphviz_chart(f"""
 	digraph G {{
 		rankdir=TB;
-		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}"]
-		GRF [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS"]
-		SJB [label = "SJB = {SJB.flow['value'].mean():,.0f} CFS"]
-		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS"]
-		newman [label = "newman = {newman_average:,.0f} CFS"]
-		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS"]
+		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder]
+		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape}]
+		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
+		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
+		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape}]
 
 		node [shape=box];
 
 		MIL ->
-		GRF ->
-		SJB ->
+		CBP ->
 		ELN ->
 		newman ->
 		DTO
