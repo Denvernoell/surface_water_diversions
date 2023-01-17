@@ -116,13 +116,12 @@ def get_water_year_classification():
 	df.columns = df.iloc[0]
 	df = df.iloc[[2,3]]
 
+	# !Update this after April 1
 	WY_index = df.loc[df['Forecast Date'] == 'Jan 1, 2023']['  75%'].iloc[0]
 	if float(WY_index) > 2.5:
 		return True
 	else:
 		return False
-
-
 
 def get_curtailment_status():
 	from tableauscraper import TableauScraper as TS
@@ -135,6 +134,13 @@ def get_curtailment_status():
 	manual_c = curtailment_chowchilla.pipe(lambda df: [i for i in df['Currently Curtailed? (Manual Changes)'].unique()])
 	automatic_c = curtailment_chowchilla.pipe(lambda df: [i for i in df['Currently Curtailed? (Automatic)'].unique()])
 	return manual_c == automatic_c == ['Not Curtailed']
+
+
+
+
+
+
+
 
 
 Checks, Operations, Conditions, Diagram = st.tabs(["Checks", "Operations", "Conditions","Diagram"])
@@ -281,7 +287,7 @@ with Diagram:
 		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
 		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
 		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
-		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape}]
+		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		AWD [label = "Aliso Water District" shape=box3d]
 
 		node [shape=box];
