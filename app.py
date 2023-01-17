@@ -221,8 +221,9 @@ with Operations:
 	"Max flow rate is no more than the lower of 100 CFS or 20% of CBP flow"
 	CBP_20 = CBP_flow.mean() * .20
 	st.markdown(f"20% of CBP flow = {CBP_20:,.0f} CFS")
+	max_diversion = min(100,CBP_20)
 
-	st.metric("Max flow rate", f"{min(100,CBP_20):,.0f} CFS")
+	st.metric("Max flow rate", f"{max_diversion:,.0f} CFS")
 
 
 
@@ -278,19 +279,22 @@ with Diagram:
 		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder]
 		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape}]
 		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
+		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
 		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
 		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape}]
+		AWD [label = "Aliso Water District" shape=box3d]
 
 		node [shape=box];
 
 		MIL ->
-		CBP ->
-		ELN ->
+		CBP ->	POD -> AWD
+		CBP ->	ELN -> 
+
 		newman ->
 		DTO
 		;
 	}}
-	""")
+	""",use_container_width=True)
 
 		# GRF [label = {}] ->
 		# SJB [label = {SJB.flow['value'].mean()}] ->
