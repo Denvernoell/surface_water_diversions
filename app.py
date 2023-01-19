@@ -18,7 +18,8 @@ pd.options.display.float_format = '{:,.0f}'.format
 
 # date = st.date_input("Date")
 # start_date = arrow.get(date)
-start_date = arrow.now().shift(days=-2)
+# start_date = arrow.now().shift(days=-2)
+start_date = arrow.now().shift(days=-3)
 end_date = start_date.shift(days=1)
 
 # st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
@@ -277,7 +278,7 @@ with Diagram:
 	st.graphviz_chart(f"""
 	digraph G {{
 		rankdir=TB;
-		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder]
+		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder style=filled fillcolor=green]
 		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
