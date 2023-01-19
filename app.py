@@ -138,11 +138,6 @@ def get_curtailment_status():
 
 
 
-
-
-
-
-
 Checks, Operations, Conditions, Diagram = st.tabs(["Checks", "Operations", "Conditions","Diagram"])
 
 with Checks:
@@ -283,10 +278,10 @@ with Diagram:
 	digraph G {{
 		rankdir=TB;
 		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder]
-		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape}]
-		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
+		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
+		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
-		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
+		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		AWD [label = "Aliso Water District" shape=box3d]
 
