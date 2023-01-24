@@ -93,10 +93,16 @@ import streamlit as st
 st.title("Curtailment Status")
 L = License("A013541")
 
+status = L.get_curtailment_status()
+st.markdown(f"Curtailment Status: {status}")
+
+
 def job():
-	status = L.get_curtailment_status()
-	st.markdown(f"Curtailment Status: {status}")
 	if status != False:
 		L.send_confirmation()
+
+if st.button("Run"):
+	job()
+
 import schedule
 schedule.every(1).minutes.do(job)
