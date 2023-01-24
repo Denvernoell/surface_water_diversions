@@ -19,12 +19,14 @@ pd.options.display.float_format = '{:,.0f}'.format
 # date = st.date_input("Date")
 # start_date = arrow.get(date)
 # start_date = arrow.now().shift(days=-2)
-start_date = arrow.now().shift(days=-3)
+
+# hours -8 is to account for the time difference between UTC and PST
+start_date = arrow.now().shift(days=-2,hours=-8)
 end_date = start_date.shift(days=1)
 
 # st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
 st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
-st.markdown(f"## {end_date.format('YYYY-MM-DD HH A ZZ')}")
+# st.markdown(f"## {end_date.format('YYYY-MM-DD HH A ZZ')}")
 
 def show_condition(condition, passes):
 	c1,c2 = st.columns(2)
