@@ -94,7 +94,9 @@ st.title("Curtailment Status")
 L = License("A013541")
 
 def job():
-	if L.get_curtailment_status() != False:
+	status = L.get_curtailment_status()
+	st.markdown(f"Curtailment Status: {status}")
+	if status != False:
 		L.send_confirmation()
 import schedule
 schedule.every(1).minutes.do(job)
