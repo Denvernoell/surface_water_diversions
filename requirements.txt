@@ -5,3 +5,4 @@ requests
 tableauscraper
 beautifulsoup4
 lxml
+schedule
