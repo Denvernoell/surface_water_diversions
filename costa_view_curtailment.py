@@ -66,7 +66,10 @@ class License:
 
 		manual_c = curtailments.pipe(lambda df: [i for i in df['Currently Curtailed? (Manual Changes)'].unique()])
 		automatic_c = curtailments.pipe(lambda df: [i for i in df['Currently Curtailed? (Automatic)'].unique()])
-		return manual_c == automatic_c == ['Not Curtailed']
+		if manual_c == automatic_c == ['Not Curtailed']:
+			self.curtailment_status = "Not Curtailed"
+		else:
+			self.curtailment_status = "Curtailed"
 
 	def send_confirmation(self):
 		# print(self.owner)
@@ -80,7 +83,7 @@ class License:
 			body=f"""
 Sara,
 
-The curtailment status of {self.id} for {self.owner} is Curtailed.
+The curtailment status of {self.id} for {self.owner} is {self.curtailment_status}.
 
 Please let me know if you have any questions.
 
@@ -98,8 +101,7 @@ st.markdown(f"Curtailment Status: {status}")
 
 
 def job():
-	if status != False:
-		L.send_confirmation()
+	L.send_confirmation()
 
 if st.button("Run"):
 	job()
