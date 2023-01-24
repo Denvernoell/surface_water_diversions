@@ -46,7 +46,7 @@ def email_alert(to,cc,subject,body,files=None):
 class License:
 	def __init__(self,WR_id) -> None:
 		self.id = WR_id
-		# self.curtailment_status = self.get_curtailment_status(self.WR_id)
+		self.get_curtailment_status()
 		
 
 	def get_curtailment_status(self):
