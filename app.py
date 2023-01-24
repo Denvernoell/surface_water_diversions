@@ -24,6 +24,7 @@ end_date = start_date.shift(days=1)
 
 # st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
 st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
+st.markdown(f"## {end_date.format('YYYY-MM-DD HH A ZZ')}")
 
 def show_condition(condition, passes):
 	c1,c2 = st.columns(2)
@@ -95,8 +96,8 @@ def get_USGS_flow(site,start_date, end_date):
 	df = df.drop(index = [0])
 	return df
 
-def get_90th_percentile_flow(start_date, end_date, percentile=90):
-	url = f"https://waterdata.usgs.gov/nwis/dvstat?&site_no=11274000&agency_cd=USGS&por_11274000_9587=2208812,00060,9587,{start_date},{end_date}&stat_cds=p{percentile}_va&referred_module=sw&format=rdb"
+def get_90th_percentile_flow(start_date, end_date, percentile=90,site=11274000):
+	url = f"https://waterdata.usgs.gov/nwis/dvstat?&site_no={site}&agency_cd=USGS&por_11274000_9587=2208812,00060,9587,{start_date},{end_date}&stat_cds=p{percentile}_va&referred_module=sw&format=rdb"
 	df = pd.read_csv(url, skiprows=44, sep="\t")
 	df = df.drop(index = [0])
 	return df
