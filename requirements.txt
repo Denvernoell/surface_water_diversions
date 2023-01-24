@@ -1,7 +1,6 @@
 pandas
 arrow
 requests
-# json
 tableauscraper
 beautifulsoup4
 lxml
