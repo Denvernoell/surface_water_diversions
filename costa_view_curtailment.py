@@ -88,6 +88,8 @@ Denver
 	# files=[projected_pdf_path,actual_pdf_path]
 	)
 
+import streamlit as st
+st.title("Curtailment Status")
 L = License("A013541")
 
 def job():
