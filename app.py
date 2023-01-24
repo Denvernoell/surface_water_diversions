@@ -28,15 +28,21 @@ end_date = start_date.shift(days=1)
 st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
 # st.markdown(f"## {end_date.format('YYYY-MM-DD HH A ZZ')}")
 
-def show_condition(condition, passes):
+def show_condition(condition, passes,url=None):
 	c1,c2 = st.columns(2)
 	with c1:
 		st.markdown(condition)
 	with c2:
-		if passes:
-			st.success("Pass")
-		else:
-			st.error("Fail")
+		try:
+			if passes:
+				st.success("Pass")
+			else:
+				st.error("Fail")
+		except:
+			if url:
+				st.warning(f"Error checking {url}")
+			else:
+				st.warning(f"Error checking condition")
 
 class CDEC_flow:
 	def __init__(self,station,sensors,dur_code,start_date=start_date,end_date=end_date):
@@ -193,13 +199,14 @@ with Checks:
 
 	show_condition(
 		"There must not be any curtailments of Post 1914 appropriators on the Chowchilla River",
-		get_curtailment_status()
+		get_curtailment_status(),
+		"https://www.waterboards.ca.gov/drought/delta/#tableau",
 	)
 
 
 	show_condition(
 		"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
-		newman_average > newman_90,	
+		newman_average > newman_90,
 		)
 
 	show_condition("a. delta outflow is above 44,500 cfs",DTO.flow['value'].iloc[0] > 44500)
