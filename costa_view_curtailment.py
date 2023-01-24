@@ -96,8 +96,7 @@ import streamlit as st
 st.title("Curtailment Status")
 L = License("A013541")
 
-status = L.get_curtailment_status()
-st.markdown(f"Curtailment Status: {status}")
+st.markdown(f"Curtailment Status: {L.curtailment_status}")
 
 
 def job():
