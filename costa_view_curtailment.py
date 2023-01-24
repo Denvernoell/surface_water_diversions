@@ -8,14 +8,15 @@ from email.mime.image import MIMEImage
 
 from email.mime.application import MIMEApplication
 
-import tomli
-# read config.toml as config
-with open('..\\.streamlit\\secrets.toml','rb') as f:
-	config = tomli.load(f)
+# import tomli
+# # read config.toml as config
+# with open('..\\.streamlit\\secrets.toml','rb') as f:
+# 	config = tomli.load(f)
+# config = st.secrets
 
 def email_alert(to,cc,subject,body,files=None):
-	username = config['username']
-	password = config['password']
+	username = st.secrets['username']
+	password = st.secrets['password']
 	msg = EmailMessage()
 	msg.set_content(body)
 	msg['Subject'] = subject
