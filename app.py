@@ -43,6 +43,14 @@ def show_condition(condition, passes,url=None):
 				st.warning(f"Error checking {url}")
 			else:
 				st.warning(f"Error checking condition")
+	# return condition
+
+
+
+
+# Friant dam releases
+# https://www.restoresjr.net/restoration-flows/flow-schedule/
+
 
 class CDEC_flow:
 	def __init__(self,station,sensors,dur_code,start_date=start_date,end_date=end_date):
@@ -285,15 +293,16 @@ with Diagram:
 	# """
 	# https://graphviz.org/doc/info/shapes.html
 	shape = "box"
+	#  style=filled fillcolor=green]
 	st.graphviz_chart(f"""
 	digraph G {{
 		rankdir=TB;
-		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder style=filled fillcolor=green]
-		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
-		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
+		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder
+		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape}]
+		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
 		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
-		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape} style=filled fillcolor=green]
-		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
+		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
+		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape}]
 		AWD [label = "Aliso Water District" shape=box3d]
 
 		node [shape=box];
