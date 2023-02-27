@@ -21,11 +21,11 @@ pd.options.display.float_format = '{:,.0f}'.format
 # start_date = arrow.now().shift(days=-2)
 
 # hours -8 is to account for the time difference between UTC and PST
-start_date = arrow.now().shift(days=-2,hours=-8)
-end_date = start_date.shift(days=1)
+start_date = arrow.get("1/1/2023","M/D/YYYY")
+end_date = arrow.get("6/14/2023","M/D/YYYY")
 
-# st.markdown(f"**{start_date.format('YYYY-MM-DD')} - {end_date.format('YYYY-MM-DD')}**")
-st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
+title = f"{start_date.format('MMMM D, YYYY')} - {end_date.format('MMMM D, YYYY')}"
+# st.markdown(f"## {end_date.format('YYYY-MM-DD')}")
 # st.markdown(f"## {end_date.format('YYYY-MM-DD HH A ZZ')}")
 
 def show_condition(condition, passes,url=None):
@@ -43,14 +43,6 @@ def show_condition(condition, passes,url=None):
 				st.warning(f"Error checking {url}")
 			else:
 				st.warning(f"Error checking condition")
-	# return condition
-
-
-
-
-# Friant dam releases
-# https://www.restoresjr.net/restoration-flows/flow-schedule/
-
 
 class CDEC_flow:
 	def __init__(self,station,sensors,dur_code,start_date=start_date,end_date=end_date):
@@ -193,47 +185,51 @@ with Checks:
 	MIL_spill = CDEC_flow("MIL","71","D")
 	MIL_regulated = CDEC_flow("MIL","85","D")
 
+def plot_newman():
+	fig, ax = plt.subplots()
+	newman['15012_00060'].plot()
+	ax.axhline(newman_90, color='r', linestyle='--')
+	ax.axhline(newman_average, color='g', linestyle='--')
+	ax.set_title("Newman Gage")
+	st.pyplot(fig)
+
+def plot_cbp():
+	fig, ax = plt.subplots()
+	CBP.flow['value'].plot()
+	ax.axhline(1938, color='r', linestyle='--')
+	ax.set_title("CBP")
+	st.pyplot(fig)
+
+def plot_eln():
+	fig, ax = plt.subplots()
+	ELN.flow['value'].plot()
+	ax.axhline(1297, color='r', linestyle='--')
+	ax.set_title("ELN")
+	st.pyplot(fig)
 
 
-	show_condition(
-		"period of 1/1/ 2023 to 6/14/2023",
-		arrow.get('2023-01-01','YYYY-MM-DD') < end_date < arrow.get("2023-06-14","YYYY-MM-DD"),
-		)
-	# Uncomment this until April 1 comes out
-	# show_condition(
-	# 	"b. The water year type (April 1) is 'below normal', 'normal', or Wet based on bulletin 120",
-	# 	get_water_year_classification()
-	# )
+def plot_conditions():
+	plot_newman()
+	plot_cbp()
+	plot_eln()
 
-	show_condition(
-		"There must not be any curtailments of Post 1914 appropriators on the Chowchilla River",
-		get_curtailment_status(),
-		"https://www.waterboards.ca.gov/drought/delta/#tableau",
-	)
+def check_conditions():
+	"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31"
+	newman_average > newman_90
 
 
-	show_condition(
-		"c. Newman Gage (11274000) instantaneous of mean flow for previous 24 hour period greater than the published daily 90th percentile for 1/1 through 3/31",
-		newman_average > newman_90,
-		)
+	"a. delta outflow is above 44,500 cfs"
+	DTO.flow['value'].iloc[0] > 44500
 
-	show_condition("a. delta outflow is above 44,500 cfs",DTO.flow['value'].iloc[0] > 44500)
-
-	show_condition(
-		"b. ELN instantaneous of mean flow for pervious 24 hour period greater than or equal 1297 CFS.",
-		ELN.flow['value'].mean() >= 1297
-		)
-
-	show_condition(
-		"a. CBP instantaneous of mean flow for previous 24 hour period greater than or equal 1938 CFS.",
-		# CBP.flow['value'].mean() >= 1938
-		CBP_flow.mean() >= 1938
-		)
+	"b. ELN instantaneous of mean flow for pervious 24 hour period greater than or equal 1297 CFS."
+	ELN.flow['value'].mean() >= 1297
 
 
-with Operations:
+	"a. CBP instantaneous of mean flow for previous 24 hour period greater than or equal 1938 CFS."
+	CBP_flow.mean() >= 1938
+	
 
-	st.markdown("## Diversion Conditions")
+def check_flow():
 	"No more than 10,000 AF in season"
 
 	# "l. 20% calculation of daily flow at CBP gage for Jan 1 to March 31"
@@ -246,18 +242,6 @@ with Operations:
 	st.metric("Max flow rate", f"{max_diversion:,.0f} CFS")
 
 
-
-	# CBP_20 = CDEC_flow(
-	# 		"CBP",
-	# 		"20",
-	# 		"H",
-	# 		arrow.get('Jan 1,2023',"MMM D,YYYY").format('YYYY-MM-DD'),
-	# 		arrow.get('Mar 31, 2023',"MMM D, YYYY").format('YYYY-MM-DD')).flow
-	# # st.dataframe(flow)
-
-	# st.markdown(flow['value'].mean() * 0.2)
-
-	# st.markdown(CBP_flow.columns)
 
 with Conditions:
 	with st.expander("Delta Outflow"):
@@ -293,16 +277,15 @@ with Diagram:
 	# """
 	# https://graphviz.org/doc/info/shapes.html
 	shape = "box"
-	#  style=filled fillcolor=green]
 	st.graphviz_chart(f"""
 	digraph G {{
 		rankdir=TB;
-		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder]
-		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape}]
-		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape}]
+		MIL [label = "MIL regulated = {MIL_regulated.flow['value'].mean():,.0f}\nMIL spill = {MIL_spill.flow['value'].mean():,.0f}" shape=cylinder style=filled fillcolor=green]
+		CBP [label = "GRF = {GRF.flow['value'].mean():,.0f} CFS\n- SJB = {SJB.flow['value'].mean():,.0f} CFS\n---------------\nCBP = {CBP_flow.mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
+		ELN [label = "ELN = {ELN.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		POD [label = "POD max diversion = {max_diversion:,.0f} CFS" shape=rpromoter]
-		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape}]
-		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape}]
+		newman [label = "Newman = {newman_average:,.0f} CFS" shape={shape} style=filled fillcolor=green]
+		DTO [label = "DTO = {DTO.flow['value'].mean():,.0f} CFS" shape={shape} style=filled fillcolor=green]
 		AWD [label = "Aliso Water District" shape=box3d]
 
 		node [shape=box];
